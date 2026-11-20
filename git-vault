@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# git-vault: keep a git repository local and backed up.
+# Runs as `git vault <command>` when this file is on PATH.
+# Target: Git Bash on Windows (Git for Windows). Should also run on Linux/macOS bash.
+set -euo pipefail
+
+VAULT_VERSION="0.0.1"
+
+die()  { printf 'git-vault: %s\n' "$*" >&2; exit 1; }
+todo() { printf 'git-vault: %s is not implemented yet\n' "$1" >&2; exit 2; }
+
+usage() {
+  cat <<'EOF'
+usage: git vault <command> [options]
+
+Commands:
+  lock                 Disable pushing from this repository
+  unlock               Restore pushing
+  status               Show lock state and last backup
+  backup <dest>        Write a verified bundle of all history to <dest>
+  restore <src> <dir>  Clone the newest valid bundle in <src> into <dir>
+  schedule <dest>      Run backups on a schedule (Windows Task Scheduler)
+  doctor               Check that locking and backups are healthy
+  version              Print the version
+  help                 Show this help
+EOF
+}
+
+cmd_version() { printf 'git-vault %s\n' "$VAULT_VERSION"; }
+
+main() {
+  local cmd="${1:-help}"
+  [[ $# -gt 0 ]] && shift
+  case "$cmd" in
+    version|--version|-v) cmd_version ;;
+    help|--help|-h)       usage ;;
+    lock)                 todo lock ;;
+    unlock)               todo unlock ;;
+    status)               todo status ;;
+    backup)               todo backup ;;
+    restore)              todo restore ;;
+    schedule)             todo schedule ;;
+    doctor)               todo doctor ;;
+    *) usage >&2; die "unknown command: $cmd" ;;
+  esac
+}
+
+main "$@"

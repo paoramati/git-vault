@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ticket frontmatter",
+  "type": "object",
+  "required": ["id", "title", "type", "status", "priority"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[A-Za-z]+-[A-Za-z0-9.]+$" },
+    "title": { "type": "string", "minLength": 5 },
+    "type": { "enum": ["epic", "feature", "mechanic", "standard", "workflow", "spike", "bug", "chore"] },
+    "status": { "enum": ["draft", "ready", "in_progress", "in_review", "done", "blocked", "cancelled"] },
+    "priority": { "type": "integer", "minimum": 0, "maximum": 4 },
+    "parent": { "type": "string" },
+    "depends_on": { "type": "array", "items": { "type": "string" } },
+    "labels": { "type": "array", "items": { "type": "string" } },
+    "layer": { "type": "string" },
+    "legacy_ref": { "type": "string", "description": "Screen, class or module in the old system this replaces" },
+    "acceptance_criteria": { "type": "array", "items": { "type": "string" } },
+    "external_ref": { "type": "string", "description": "ID in the destination tracker once migrated" },
+    "goal": { "type": "string" },
+    "success_metric": { "type": "string" },
+    "out_of_scope": { "type": "array", "items": { "type": "string" } },
+    "user_story": { "type": "string" },
+    "parity_notes": { "type": "string" },
+    "invariants": { "type": "array", "items": { "type": "string" } },
+    "edge_cases": { "type": "array", "items": { "type": "string" } },
+    "rule": { "type": "string" },
+    "rationale": { "type": "string" },
+    "example_ref": { "type": "string" },
+    "question": { "type": "string" },
+    "timebox_hours": { "type": "number" },
+    "decision_record": { "type": "string" },
+    "time": {
+      "type": "object",
+      "properties": {
+        "active_seconds": { "type": "integer", "minimum": 0 },
+        "sessions": { "type": ["array", "null"] }
+      }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "type": { "const": "epic" } } },
+      "then": { "required": ["goal", "success_metric"] } },
+    { "if": { "properties": { "type": { "const": "feature" } } },
+      "then": { "required": ["parent", "acceptance_criteria"] } },
+    { "if": { "properties": { "type": { "const": "mechanic" } } },
+      "then": { "required": ["parent", "invariants", "acceptance_criteria"] } },
+    { "if": { "properties": { "type": { "const": "standard" } } },
+      "then": { "required": ["rule", "rationale"] } },
+    { "if": { "properties": { "type": { "const": "spike" } } },
+      "then": { "required": ["question", "timebox_hours"] } },
+    { "if": { "properties": { "status": { "const": "ready" }, "type": { "not": { "enum": ["epic", "spike", "standard"] } } } },
+      "then": { "required": ["acceptance_criteria"], "properties": { "acceptance_criteria": { "minItems": 1 } } } }
+  ]
+}

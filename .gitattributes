@@ -1,0 +1,10 @@
+# Bash under Git for Windows breaks on CRLF. Force LF for everything bash reads.
+* text=auto
+git-vault text eol=lf
+*.sh      text eol=lf
+*.bash    text eol=lf
+*.bats    text eol=lf
+*.md      text eol=lf
+*.json    text eol=lf
+*.py      text eol=lf
+*.bundle  binary
