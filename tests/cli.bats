@@ -38,3 +38,31 @@ teardown() { teardown_repo; }
   [ "$status" -eq 0 ]
   [[ "$output" == git-vault\ * ]]
 }
+
+@test "each stub command exits 2 with a not-implemented message" {
+  for c in lock unlock status backup restore schedule doctor; do
+    run "$VAULT" "$c"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"git-vault: $c is not implemented yet"* ]]
+  done
+}
+
+@test "every command in help has lib/cmd_<name>.sh" {
+  for c in lock unlock status backup restore schedule doctor; do
+    [ -f "$BATS_TEST_DIRNAME/../lib/cmd_$c.sh" ]
+  done
+}
+
+@test "works via a symlink to the entrypoint" {
+  ln -s "$VAULT" "$TEST_ROOT/gv" 2>/dev/null || skip "symlinks unavailable"
+  [ -L "$TEST_ROOT/gv" ] || skip "symlinks unavailable"
+  run "$TEST_ROOT/gv" lock
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"lock is not implemented yet"* ]]
+}
+
+@test "command names cannot escape lib/" {
+  run "$VAULT" ../git-vault
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"unknown command"* ]]
+}

@@ -7,6 +7,9 @@ target="${1:-$HOME/bin}"
 mkdir -p "$target"
 cp "$src" "$target/git-vault"
 chmod +x "$target/git-vault"
+# Dev install: the entrypoint finds lib/ next to itself. W-1 builds the single file.
+mkdir -p "$target/lib"
+cp "$(dirname "$src")"/lib/*.sh "$target/lib/"
 echo "installed $target/git-vault"
 case ":$PATH:" in
   *":$target:"*) ;;

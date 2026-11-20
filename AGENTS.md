@@ -8,7 +8,9 @@ Use the `bash-on-windows` skill (shared, in the Home Repo's `skills/`) before wr
 
 ## Layout
 
-- `git-vault`: the whole tool. One file, one function per command (`cmd_<name>`), dispatched from `main`.
+- `git-vault`: small entrypoint: version, usage, dispatch. Finds `lib/` via its real path (symlink-safe).
+- `lib/cmd_<name>.sh`: one file per command, defining `cmd_<name>`. Add a command by adding its file plus one line in the usage text. `lib/common.sh`: shared helpers (`die`, `todo`).
+- Release packaging (ticket W-1) builds the single-file install from the entrypoint plus `lib/`. `install.sh` currently copies only the entrypoint, so it works for development in-tree only.
 - `tests/*.bats`: one file per command. Use `tests/test_helper.bash`; every test works in a temp repo.
 - `ci.sh`: run it. It is the only definition of passing.
 - `tracker/tickets/`: ticket source files. `docs/decisions/`: spike outputs.
