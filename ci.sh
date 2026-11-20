@@ -37,6 +37,7 @@ done
 if [[ ${#PYCMD[@]} -gt 0 ]]; then
   "${PYCMD[@]}" tracker/validate.py tracker/tickets tracker/schema.json
 else
+  if [[ "${GATE_STRICT:-0}" == 1 ]]; then echo "python with pyyaml+jsonschema is required in strict mode (the factory loop)"; exit 1; fi
   echo "python with pyyaml+jsonschema not available; skipping"
 fi
 
