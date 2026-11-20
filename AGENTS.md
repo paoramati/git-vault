@@ -13,7 +13,7 @@ Use the `bash-on-windows` skill (shared, in the Home Repo's `skills/`) before wr
 - Release packaging (ticket W-1) builds the single-file install from the entrypoint plus `lib/`. `install.sh` currently copies only the entrypoint, so it works for development in-tree only.
 - `tests/*.bats`: one file per command. Use `tests/test_helper.bash`; every test works in a temp repo.
 - `ci.sh`: run it. It is the only definition of passing.
-- `tracker/tickets/`: ticket source files. `docs/decisions/`: spike outputs.
+- `tracker/tickets/`: the original ticket spec files (history; live tickets are GitHub Issues). `docs/decisions/`: spike outputs.
 
 ## Scope
 
@@ -23,7 +23,7 @@ Use the `bash-on-windows` skill (shared, in the Home Repo's `skills/`) before wr
 
 ## Git
 
-- Commit locally with messages starting with the ticket ID: `M-2: verify bundle before rename`.
+- Commit locally with messages starting with the ticket ID the loop gives you: `gh-5: verify bundle before rename`.
 - Never push, add remotes, or change remote URLs.
 - Never rewrite history on main.
 
@@ -32,7 +32,7 @@ Use the `bash-on-windows` skill (shared, in the Home Repo's `skills/`) before wr
 - Every acceptance criterion has a bats test that would fail without your change.
 - `./ci.sh` passes. Run it; do not assume.
 - `git vault help` reflects any new options.
-- A ticket note says what changed and what a reviewer should check.
+- An issue comment (a ticket note) says what changed and what a reviewer should check.
 
 ## Never
 
@@ -49,11 +49,11 @@ Same failure three times: stop, write what you tried and what you suspect in a t
 
 ### Issue tracker
 
-Tickets live in beads (`bd`), the local store the factory loop reads; GitHub is a published mirror. See `docs/agents/issue-tracker.md`.
+GitHub Issues on paoramati/git-vault, via the `gh` CLI; the factory loop reads them. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-`ready-for-agent` is the beads label `agent-ok`; `ready-for-human` is `human-only`. See `docs/agents/triage-labels.md`.
+Default vocabulary: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 

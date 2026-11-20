@@ -1,23 +1,22 @@
-# Issue tracker: beads
+# Issue tracker: GitHub Issues
 
-Tickets for this repo live in beads (`bd`), a local Dolt store in the git-ignored `.beads/` folder. The factory loop reads it. The ticket source files in `tracker/tickets/*.md` are validated by `ci.sh` and imported with `tracker/import-to-beads.sh`; GitHub is a published mirror, not the source.
+Tickets for this repo live as GitHub issues on paoramati/git-vault, via the `gh` CLI. The factory loop reads them (`TRACKER=github`). They were migrated from beads on 2026-11-21; the id map from old beads ids to issue numbers is `tracker/github-issue-map.json`. `tracker/tickets/*.md` are the original spec files, kept as history and still validated by `ci.sh`; they are no longer the source.
 
 ## Conventions
 
-- **Create a ticket**: write `tracker/tickets/<ID>.md`, then run the importer. For a one-off, `bd create "title" -t <type> -p <0-4> --body-file <file>`. Pass long text with `--body-file`; `-d` mangles text starting with `---`.
-- **Read a ticket**: `bd show <id>` (add `--json`). Dependencies and notes appear in the output.
-- **List**: `bd list` (all open), `bd ready --label agent-ok` (the frontier: unblocked, agent-safe), `bd list --all` (include closed).
-- **Comment**: `bd comments add <id> "text"`.
-- **Labels**: `bd label add <id> label1,label2`.
-- **Status**: `bd update <id> --status open|in_progress|blocked|closed`; `bd close <id>`.
-- **Blocking**: `bd dep add <ticket> <blocker>`; parent link with `--type parent-child`.
-- **Run from any worktree**: set `BEADS_DIR` to the main repo's `.beads` (the loop does this).
-- **Remotes**: use `bd dolt push --remote private --no-adopt`. Leave `--yes` off: it can adopt the public GitHub remote.
+- **Create a ticket**: `gh issue create --title "..." --body-file <file> --label ready-for-agent`. The body ends with a `## Blocked by` section, one `- Blocked by #N` line per blocker, or `None - can start immediately`. A `## Parent` section with `#N` names the epic.
+- **Read a ticket**: `gh issue view <n> --comments`.
+- **List**: `gh issue list --state open`. The frontier (what the loop will pick): `py <kit>/tracker/gh_tracker.py ready --repo paoramati/git-vault`. Check the blocker lines: `... check --repo paoramati/git-vault`.
+- **Comment**: `gh issue comment <n> --body "text"`.
+- **Labels**: `gh issue edit <n> --add-label x --remove-label y`. The loop uses `ready-for-agent`, `in-progress` and `ready-for-human`.
+- **Close**: `gh issue close <n>`. The loop closes a ticket when it is merged.
+- An issue that other issues name under `## Parent` is an epic (like #1) and is never built.
+- Agents only run `gh issue view` and `gh issue comment`; the loop alone changes labels and state.
 
 ## When a skill says "publish to the issue tracker"
 
-Add a ticket source file under `tracker/tickets/` and import it, so `ci.sh` validates it.
+Create a GitHub issue as above.
 
 ## When a skill says "fetch the relevant ticket"
 
-Run `bd show <id>`.
+Run `gh issue view <n> --comments`.
