@@ -40,7 +40,7 @@ teardown() { teardown_repo; }
 }
 
 @test "each stub command exits 2 with a not-implemented message" {
-  for c in lock unlock status backup restore schedule doctor; do
+  for c in status backup restore schedule doctor; do
     run "$VAULT" "$c"
     [ "$status" -eq 2 ]
     [[ "$output" == *"git-vault: $c is not implemented yet"* ]]
@@ -56,9 +56,9 @@ teardown() { teardown_repo; }
 @test "works via a symlink to the entrypoint" {
   ln -s "$VAULT" "$TEST_ROOT/gv" 2>/dev/null || skip "symlinks unavailable"
   [ -L "$TEST_ROOT/gv" ] || skip "symlinks unavailable"
-  run "$TEST_ROOT/gv" lock
+  run "$TEST_ROOT/gv" status
   [ "$status" -eq 2 ]
-  [[ "$output" == *"lock is not implemented yet"* ]]
+  [[ "$output" == *"status is not implemented yet"* ]]
 }
 
 @test "command names cannot escape lib/" {
