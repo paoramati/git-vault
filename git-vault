@@ -6,8 +6,18 @@ set -euo pipefail
 
 VAULT_VERSION="0.0.1"
 
-die()  { printf 'git-vault: %s\n' "$*" >&2; exit 1; }
-todo() { printf 'git-vault: %s is not implemented yet\n' "$1" >&2; exit 2; }
+# Resolve the real path of this script (following symlinks) to find lib/.
+_src="${BASH_SOURCE[0]}"
+while [[ -L "$_src" ]]; do
+  _dir="$(cd -P "$(dirname "$_src")" && pwd)"
+  _src="$(readlink "$_src")"
+  [[ "$_src" == /* ]] || _src="$_dir/$_src"
+done
+VAULT_LIB="$(cd -P "$(dirname "$_src")" && pwd)/lib"
+unset _src _dir
+
+# shellcheck source=lib/common.sh
+source "$VAULT_LIB/common.sh"
 
 usage() {
   cat <<'EOF'
@@ -32,17 +42,17 @@ main() {
   local cmd="${1:-help}"
   [[ $# -gt 0 ]] && shift
   case "$cmd" in
-    version|--version|-v) cmd_version ;;
-    help|--help|-h)       usage ;;
-    lock)                 todo lock ;;
-    unlock)               todo unlock ;;
-    status)               todo status ;;
-    backup)               todo backup ;;
-    restore)              todo restore ;;
-    schedule)             todo schedule ;;
-    doctor)               todo doctor ;;
-    *) usage >&2; die "unknown command: $cmd" ;;
+    version|--version|-v) cmd_version; return ;;
+    help|--help|-h)       usage; return ;;
   esac
+  # Command names are lowercase words; this also blocks path tricks like ../x.
+  if [[ "$cmd" =~ ^[a-z][a-z]*$ && -f "$VAULT_LIB/cmd_$cmd.sh" ]]; then
+    # shellcheck source=/dev/null
+    source "$VAULT_LIB/cmd_$cmd.sh"
+    "cmd_$cmd" "$@"
+  else
+    usage >&2; die "unknown command: $cmd"
+  fi
 }
 
 main "$@"
