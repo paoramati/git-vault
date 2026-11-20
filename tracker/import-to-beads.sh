@@ -74,6 +74,8 @@ for fm, text in tickets:
     if not bid:
         sys.exit(f"could not read the new issue id for {fm['id']}; check bd create --json output")
     ids[fm["id"]] = bid
+    # bd create -l did not apply labels in testing (bd 1.3.4), so add them explicitly
+    run([BD, "label", "add", bid, ",".join(labels)])
     print(f"{fm['id']} -> {bid}", file=sys.stderr)
 
 for fm, _ in tickets:

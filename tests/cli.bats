@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
-load test_helper
+# bats `load` rejects Windows drive paths (C:/...), so source the helper directly.
+source "$BATS_TEST_DIRNAME/test_helper.bash"
 
 setup()    { setup_repo; }
 teardown() { teardown_repo; }
@@ -31,7 +32,9 @@ teardown() { teardown_repo; }
 }
 
 @test "runs as a git subcommand when on PATH" {
-  PATH="$BATS_TEST_DIRNAME/..:$PATH" run git vault version
+  # pwd gives /c/... under Git Bash; a C:/... path would be split at the colon in PATH.
+  local root; root="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
+  PATH="$root:$PATH" run git vault version
   [ "$status" -eq 0 ]
   [[ "$output" == git-vault\ * ]]
 }

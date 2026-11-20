@@ -8,7 +8,8 @@ step() { printf '\n== %s ==\n' "$*"; }
 
 step "Line endings"
 # CRLF in a bash script breaks it under Git Bash.
-bad=$(git ls-files -z -- git-vault '*.sh' '*.bash' '*.bats' | xargs -0 grep -l $'\r' 2>/dev/null || true)
+# git ls-files --eol is reliable here; grep for a CR character matches every file under Git Bash.
+bad=$(git ls-files --eol -- git-vault '*.sh' '*.bash' '*.bats' | awk '$2 == "w/crlf" {print $NF}' || true)
 [[ -z "$bad" ]] || { echo "CRLF found in: $bad"; exit 1; }
 echo "ok"
 
