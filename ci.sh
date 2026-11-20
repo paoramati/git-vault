@@ -28,10 +28,16 @@ else
 fi
 
 step "Tickets"
-if command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml, jsonschema' 2>/dev/null; then
-  python3 tracker/validate.py tracker/tickets tracker/schema.json
+# The Windows Store "python3" stub exists but fails, so find a Python that actually runs.
+PYCMD=()
+for c in python3 python "py -3"; do
+  # shellcheck disable=SC2086
+  if $c -c 'import yaml, jsonschema' >/dev/null 2>&1; then read -r -a PYCMD <<<"$c"; break; fi
+done
+if [[ ${#PYCMD[@]} -gt 0 ]]; then
+  "${PYCMD[@]}" tracker/validate.py tracker/tickets tracker/schema.json
 else
-  echo "python3 with pyyaml+jsonschema not available; skipping"
+  echo "python with pyyaml+jsonschema not available; skipping"
 fi
 
 printf '\nci.sh: all checks passed\n'
